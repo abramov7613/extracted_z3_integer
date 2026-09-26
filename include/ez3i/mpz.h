@@ -21,6 +21,8 @@
   #endif
 #endif
 
+namespace extracted_z3_integer {
+
 EZ3I_API unsigned u_gcd(unsigned u, unsigned v);
 EZ3I_API uint64_t u64_gcd(uint64_t u, uint64_t v);
 
@@ -90,7 +92,7 @@ public:
 inline void swap(mpz & m1, mpz & m2) noexcept { m1.swap(m2); }
 
 class EZ3I_API mpz_manager {
-    mpn_manager<digit_t> m_mpn_manager;
+    mpn_calc::mpn_manager<digit_t> m_mpn_manager;
 
     // 64-bit machine?
     static const unsigned m_init_cell_capacity = sizeof(digit_t) == sizeof(uint64_t) ? 4 : 6;
@@ -558,3 +560,5 @@ public:
 
     digit_t get_least_significant(mpz const& a);
 }; // class mpz_manager
+
+} // namespace extracted_z3_integer

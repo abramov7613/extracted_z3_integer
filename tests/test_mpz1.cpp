@@ -12,6 +12,8 @@ using boost::multiprecision::cpp_int;
 
 namespace {
 
+using namespace extracted_z3_integer;
+
 std::string text(const cpp_int& value) {
     return value.str();
 }

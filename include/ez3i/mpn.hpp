@@ -107,6 +107,8 @@ struct decimal_traits {
 
 } // namespace mpn_detail
 
+namespace mpn_calc {
+
 /**
  * @brief Multi-precision unsigned integer arithmetic over configurable digits.
  * @tparam Digit Unsigned integral digit type. Supported widths are 8, 16, 32 bits.
@@ -708,3 +710,5 @@ template<mpn_detail::MpnDigit Digit>
 std::string mpn_manager<Digit>::to_string(std::span<const Digit> a) const {
     return to_string(a.data(), a.size());
 }
+
+} // namespace mpn_calc

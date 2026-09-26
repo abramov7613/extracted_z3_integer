@@ -13,6 +13,10 @@ constexpr auto QUOT_ONLY = 0;
 constexpr auto REM_ONLY = 1;
 constexpr auto QUOT_AND_REM = 2;
 
+namespace {
+
+using namespace extracted_z3_integer;
+
 #define LEHMER_GCD // Available GCD algorithms: EUCLID_GCD || BINARY_GCD || LS_BINARY_GCD
 
 #ifdef __has_builtin
@@ -245,6 +249,9 @@ public:
     }
 }; // class _scoped_numeral
 
+} // namespace
+
+namespace extracted_z3_integer {
 
 unsigned u_gcd(unsigned u, unsigned v) {
     if (u == 0) return v;
@@ -2303,3 +2310,5 @@ bool mpz_manager::divides(mpz const & a, mpz const & b) {
     }
     return r;
 }
+
+} // namespace extracted_z3_integer

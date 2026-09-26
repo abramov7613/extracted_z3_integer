@@ -15,6 +15,8 @@ constexpr auto I64_MAX = std::numeric_limits<std::int64_t>::max();
 
 namespace {
 
+using namespace extracted_z3_integer;
+
 //=============================  HELPERS =====================================
 
 cpp_int to_cpp_int(std::int64_t v) { return cpp_int(v); }

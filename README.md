@@ -75,7 +75,7 @@ public:
 
 `mpz_manager` is the central facade. It owns the low-level unsigned arithmetic engine (`mpn_manager`), manages all heap allocation for `mpz_cell` objects, and dispatches every operation to either a fast inline path (when both operands are small) or a multi-precision path (when at least one operand is large). Users are expected to create one `mpz_manager` instance and use it for all operations — it tracks internal state such as the pre-computed value of 2⁶⁴.
 
-> **Memory ownership rule.** Every `mpz` created or modified by `mpz_manager` must eventually be released with `del()` or `reset()`. The helper template `_scoped_numeral<mpz_manager>` provides RAII-style automatic cleanup.
+> **Memory ownership rule.** Every `mpz` created or modified by `mpz_manager` must eventually be released with `del()` or `reset()`. Original Z3 architecture saved. The helper class `scoped_numeral` in cpp file provides RAII-style automatic cleanup.
 
 ---
 
@@ -229,11 +229,12 @@ All bitwise operations require non-negative operands (asserted in debug builds).
 ### Standalone build
 
 ```bash
-git clone https://github.com/<your-org>/ez3i.git
-cd ez3i
-cmake -B build -DEZ3I_BUILD_TESTS=ON
+git clone https://github.com/abramov7613/extracted_z3_integer.git
+cd extracted_z3_integer
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build
-ctest --test-directory build
+cd build
+ctest
 ```
 
 ### CMake options
@@ -247,7 +248,7 @@ ctest --test-directory build
 ### Installation
 
 ```bash
-cmake --install build --prefix /usr/local
+sudo cmake --install build
 ```
 
 ---
@@ -260,8 +261,8 @@ cmake --install build --prefix /usr/local
 include(FetchContent)
 FetchContent_Declare(
     ez3i
-    GIT_REPOSITORY https://github.com/abramov7613/ez3i.git
-    GIT_TAG        v1.0.0
+    GIT_REPOSITORY https://github.com/abramov7613/extracted_z3_integer.git
+    GIT_TAG        v1.0.1
 )
 FetchContent_MakeAvailable(ez3i)
 
@@ -284,6 +285,7 @@ target_link_libraries(my_app PRIVATE ez3i)
 ```cpp
 #include <ez3i/mpz.h>
 #include <iostream>
+using namespace extracted_z3_integer;
 
 int main() {
     mpz_manager mgr;
@@ -328,6 +330,7 @@ This example demonstrates the `mk_z` factory for creating temporary small values
 ```cpp
 #include <ez3i/mpz.h>
 #include <iostream>
+using namespace extracted_z3_integer;
 
 int main() {
     mpz_manager mgr;
@@ -380,6 +383,7 @@ int main() {
 ```cpp
 #include <ez3i/mpz.h>
 #include <iostream>
+using namespace extracted_z3_integer;
 
 int main() {
     mpz_manager mgr;
@@ -426,16 +430,20 @@ int main() {
 ## Project Structure
 
 ```
-ez3i/
+extracted_z3_integer/
 ├── CMakeLists.txt
+├── README.md
+├── LICENSE
 ├── include/
 │   └── ez3i/
-│       ├── mpz.h          # Public API: mpz, mpz_cell, mpz_manager
-│       └── mpn.hpp        # Internal: unsigned multi-precision arithmetic
+│        ├── mpz.h       # Public API: mpz, mpz_cell, mpz_manager
+│        └── mpn.hpp     # Internal: unsigned multi-precision arithmetic
 ├── src/
-│   └── mpz.cpp           # Implementation of mpz_manager
+│    └── mpz.cpp         # Implementation of mpz_manager
 └── tests/
-    └── CMakeLists.txt     # Unit tests
+     ├── CMakeLists.txt  
+     ├── test_mpz.cpp
+     └── test_mpz1.cpp
 ```
 
 ---
