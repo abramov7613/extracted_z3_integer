@@ -262,7 +262,7 @@ include(FetchContent)
 FetchContent_Declare(
     ez3i
     GIT_REPOSITORY https://github.com/abramov7613/extracted_z3_integer.git
-    GIT_TAG        v1.0.1
+    GIT_TAG        v1.0.2
 )
 FetchContent_MakeAvailable(ez3i)
 
@@ -271,9 +271,32 @@ target_link_libraries(my_app PRIVATE ez3i)
 
 ### add_subdirectory
 
+```
+cd my_app/source/root/directory
+mk_dir third_party
+cd third_party
+git clone https://github.com/abramov7613/extracted_z3_integer.git
+cd extracted_z3_integer
+```
+
 ```cmake
-add_subdirectory(third_party/ez3i)
-target_link_libraries(my_app PRIVATE ez3i)
+add_subdirectory(third_party/extracted_z3_integer)
+target_link_libraries(my_app PRIVATE ez3i::ez3i)
+```
+
+### find_package
+
+```
+git clone https://github.com/abramov7613/extracted_z3_integer.git
+cd extracted_z3_integer
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON
+cmake --build build
+sudo cmake --install build
+```
+
+```cmake
+find_package(ez3i CONFIG REQUIRED)
+target_link_libraries(my_app PRIVATE ez3i::ez3i)
 ```
 
 ---

@@ -6,7 +6,7 @@
 #include <vector>
 #include <gtest/gtest.h>
 #include <boost/multiprecision/cpp_int.hpp>
-#include "mpz.h"
+#include "ez3i/mpz.h"
 
 using boost::multiprecision::cpp_int;
 

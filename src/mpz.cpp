@@ -7,7 +7,7 @@
 #include <bit>
 #include <functional>
 #include <string_view>
-#include "mpz.h"
+#include "ez3i/mpz.h"
 
 constexpr auto QUOT_ONLY = 0;
 constexpr auto REM_ONLY = 1;
@@ -1670,7 +1670,7 @@ void mpz_manager::display_bin(std::ostream & out, mpz const & a, unsigned num_bi
 std::string mpz_manager::to_string(mpz const & a) const {
     std::ostringstream buffer;
     display(buffer, a);
-    return std::move(buffer).str();
+    return buffer.str();
 }
 
 

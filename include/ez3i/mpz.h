@@ -1,7 +1,10 @@
 #pragma once
-#include <climits>
-#include <string>
 #include <cassert>
+#include <cstdint>
+#include <climits>
+#include <ostream>
+#include <string>
+#include <utility>
 #include <vector>
 #include "mpn.hpp"
 
