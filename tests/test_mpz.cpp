@@ -76,18 +76,24 @@ void tst_div2k(mpz_manager & m, mpz const & v, unsigned k) {
     bool is_eq = m.eq(x, y);
     (void)is_eq;
     EXPECT_TRUE(is_eq);
+    m.del(x);
+    m.del(y);
+    m.del(two);
+    m.del(pw);
 }
 
 void tst_div2k(mpz_manager & m, int v, unsigned k) {
     mpz x;
     m.set(x, v);
     tst_div2k(m, x, k);
+    m.del(x);
 }
 
 void tst_div2k(mpz_manager & m, char const * v, unsigned k) {
     mpz x;
     m.set(x, v);
     tst_div2k(m, x, k);
+    m.del(x);
 }
 
 void tst_mul2k(mpz_manager & m, mpz const & v, unsigned k) {
@@ -98,18 +104,24 @@ void tst_mul2k(mpz_manager & m, mpz const & v, unsigned k) {
     bool is_eq = m.eq(x, y);
     (void)is_eq;
     EXPECT_TRUE(is_eq);
+    m.del(x);
+    m.del(y);
+    m.del(two);
+    m.del(pw);
 }
 
 void tst_mul2k(mpz_manager & m, int v, unsigned k) {
     mpz x;
     m.set(x, v);
     tst_mul2k(m, x, k);
+    m.del(x);
 }
 
 void tst_mul2k(mpz_manager & m, char const * v, unsigned k) {
     mpz x;
     m.set(x, v);
     tst_mul2k(m, x, k);
+    m.del(x);
 }
 
 //=============================  TESTS =====================================
@@ -133,6 +145,9 @@ TEST(MpzTest, OriginalTst1)
     EXPECT_TRUE(m.ge(v, v2));
     EXPECT_TRUE(m.neq(v, v2));
     EXPECT_TRUE(!m.neq(v, v3));
+    m.del(v);
+    m.del(v2);
+    m.del(v3);
 }
 
 TEST(MpzTest, OriginalBug1)
@@ -143,6 +158,8 @@ TEST(MpzTest, OriginalBug1)
     mpz v2;
     m.sub(v1, v1, v2);
     EXPECT_TRUE(m.is_zero(v2));
+    m.del(v1);
+    m.del(v2);
 }
 
 TEST(MpzTest, OriginalBug3)
@@ -154,6 +171,8 @@ TEST(MpzTest, OriginalBug3)
     m.add(v2, m.mk_z(1), v2);
     m.neg(v1);
     EXPECT_TRUE(m.eq(v1, v2));
+    m.del(v1);
+    m.del(v2);
 }
 
 TEST(MpzTest, OriginalBug4)
@@ -170,6 +189,11 @@ TEST(MpzTest, OriginalBug4)
     m.bitwise_or(result2, y, result2);
 
     EXPECT_TRUE(m.eq(result1, result2));
+
+    m.del(x);
+    m.del(y);
+    m.del(result1);
+    m.del(result2);
 }
 
 TEST(MpzTest, OriginalTst2k)
@@ -262,7 +286,13 @@ TEST(MpzTest, OriginalTstintminbug)
     m.set(expected, "18446744075857035263");
     m.sub(big, intmin, r);
     std::cout << "r: " << m.to_string(r) << "\nexpected: " << m.to_string(expected) << "\n";
+
     EXPECT_TRUE(m.eq(r, expected));
+
+    m.del(intmin);
+    m.del(big);
+    m.del(expected);
+    m.del(r);
 }
 
 TEST(MpzTest, OriginalTstint64minbug)
@@ -273,7 +303,11 @@ TEST(MpzTest, OriginalTstint64minbug)
     m.set(test, "-9223372036854775808");
     m.set(intmin, std::numeric_limits<int64_t>::min());
     std::cout << "minint: " << m.to_string(intmin) << "\n";
+
     EXPECT_TRUE(m.eq(test, intmin));
+
+    m.del(intmin);
+    m.del(test);
 }
 
 TEST(MpzTest, BoundaryInt64)
@@ -284,6 +318,8 @@ TEST(MpzTest, BoundaryInt64)
     m.set(a, I64_MAX);
 
     EXPECT_EQ(m.get_int64(a), I64_MAX);
+
+    m.del(a);
 }
 
 TEST(MpzTest, NegativeArithmetic)
@@ -302,6 +338,12 @@ TEST(MpzTest, NegativeArithmetic)
     m.add(v2, m.mk_z(1), v2);
     m.neg(v1);
     EXPECT_TRUE(m.eq(v1, v2));
+
+    m.del(a);
+    m.del(b);
+    m.del(r);
+    m.del(v1);
+    m.del(v2);
 }
 
 TEST(MpzTest, AddAcrossSmallBoundary)
@@ -316,6 +358,10 @@ TEST(MpzTest, AddAcrossSmallBoundary)
     m.add(a, b, r);
 
     EXPECT_EQ(m.to_string(r), c.str());
+
+    m.del(a);
+    m.del(b);
+    m.del(r);
 }
 
 TEST(MpzTest, Multiplication)
@@ -329,6 +375,10 @@ TEST(MpzTest, Multiplication)
     m.mul(a, b, r);
 
     EXPECT_EQ(m.get_int64(r), 1000000000000LL);
+
+    m.del(a);
+    m.del(b);
+    m.del(r);
 }
 
 TEST(MpzTest, DivisionSigns)
@@ -342,6 +392,11 @@ TEST(MpzTest, DivisionSigns)
     m.machine_div_rem(a, b, q, r);
 
     EXPECT_GT(m.get_int64(q), 0);
+
+    m.del(a);
+    m.del(b);
+    m.del(q);
+    m.del(r);
 }
 
 TEST(MpzTest, BitOperationsNegativeNumbers)
@@ -355,6 +410,10 @@ TEST(MpzTest, BitOperationsNegativeNumbers)
     m.bitwise_and(a, b, r);
 
     EXPECT_EQ(m.get_int64(r), 255);
+
+    m.del(a);
+    m.del(b);
+    m.del(r);
 }
 
 TEST(MpzTest, SmallArithmeticAgainstInt64)
@@ -370,6 +429,8 @@ TEST(MpzTest, SmallArithmeticAgainstInt64)
             m.add(x, y, r);
 
             EXPECT_EQ(m.get_int64(r), a + b);
+
+            m.del(x); m.del(y); m.del(r);
         }
     }
 }
@@ -385,6 +446,10 @@ TEST(MpzTest, GcdProperties)
     m.gcd(a, b, g);
 
     EXPECT_EQ(m.get_int64(g), 6);
+
+    m.del(a);
+    m.del(b);
+    m.del(g);
 }
 
 TEST(MpzTest, AdditionSmallRandom)
@@ -400,6 +465,8 @@ TEST(MpzTest, AdditionSmallRandom)
         m.add(x, y, r);
 
         EXPECT_EQ(m.get_int64(r), a+b) ;
+
+        m.del(x); m.del(y); m.del(r);
     }
 }
 
@@ -421,6 +488,8 @@ TEST(MpzTest, AdditionBigRandom)
 
         EXPECT_EQ(m.to_string(r), r2_str) ;
         EXPECT_TRUE(m.eq(r, r2));
+
+        m.del(x); m.del(y); m.del(r); m.del(r2);
     }
 }
 
@@ -442,6 +511,8 @@ TEST(MpzTest, SubtractionBigRandom)
 
         EXPECT_EQ(m.to_string(r), r2_str) ;
         EXPECT_TRUE(m.eq(r, r2));
+
+        m.del(x); m.del(y); m.del(r); m.del(r2);
     }
 }
 
@@ -463,6 +534,8 @@ TEST(MpzTest, MultiplicationBigRandom)
 
         EXPECT_EQ(m.to_string(r), r2_str) ;
         EXPECT_TRUE(m.eq(r, r2));
+
+        m.del(x); m.del(y); m.del(r); m.del(r2);
     }
 }
 
@@ -482,6 +555,8 @@ TEST(MpzTest, Division64)
 
         EXPECT_EQ(m.get_int64(q), a / b);
         EXPECT_EQ(m.get_int64(r), a % b);
+
+        m.del(x); m.del(y); m.del(q); m.del(r);
     }
 }
 
@@ -503,6 +578,8 @@ TEST(MpzTest, DivisionBigRandom)
 
         EXPECT_EQ(m.to_string(q), q2_str) ;
         EXPECT_TRUE(m.eq(q, q2));
+
+        m.del(x); m.del(y); m.del(q); m.del(r); m.del(q2);
     }
 }
 
@@ -521,6 +598,8 @@ TEST(MpzTest, GcdRandom)
         m.gcd(x, y, g);
 
         EXPECT_GE(m.get_int64(g), 0);
+
+        m.del(x); m.del(y); m.del(g);
     }
 }
 
@@ -535,6 +614,8 @@ TEST(MpzTest, ShiftRegression)
 
         EXPECT_EQ(m.to_string(a),
                   (cpp_int(1) << i).convert_to<std::string>());
+
+        m.del(a);
     }
 }
 
@@ -552,6 +633,8 @@ TEST(MpzTest, StringRoundTrip)
         m.set(b, s.c_str());
 
         EXPECT_TRUE(m.eq(a, b));
+
+        m.del(a); m.del(b);
     }
 
     for (auto i = 0u; i < 100; ++i)
@@ -562,6 +645,8 @@ TEST(MpzTest, StringRoundTrip)
       auto out = m.to_string(a);
 
       EXPECT_EQ(str, out) << "str = " << str << "; out = " << out;
+
+      m.del(a);
     }
 }
 

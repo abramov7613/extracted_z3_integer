@@ -64,6 +64,7 @@ TEST(MpzTest1, BoundaryValuesRoundTrip) {
         mpz value;
         manager.set(value, expected.c_str());
         EXPECT_EQ(manager.to_string(value), expected) << "value=" << expected;
+        manager.del(value);
     }
 }
 
@@ -84,6 +85,7 @@ TEST(MpzTest1, BoundaryArithmetic) {
         EXPECT_EQ(as_cpp(result, manager), value - 1);
         manager.neg(input);
         EXPECT_EQ(as_cpp(input, manager), -value);
+        manager.del(input); manager.del(one); manager.del(result);
     }
 }
 
@@ -109,6 +111,8 @@ TEST(MpzTest1, ArithmeticMatchesReference) {
         EXPECT_EQ(as_cpp(result, manager), a + b * a);
         manager.submul(x, y, x, result);
         EXPECT_EQ(as_cpp(result, manager), a - b * a);
+
+        manager.del(x); manager.del(y); manager.del(result);
     }
 }
 
@@ -136,6 +140,12 @@ TEST(MpzTest1, DivisionRemainderAndModuloMatchReference) {
         if (expected_mod < 0)
             expected_mod += b < 0 ? -b : b;
         EXPECT_EQ(as_cpp(result, manager), expected_mod);
+
+        manager.del(x);
+        manager.del(y);
+        manager.del(quotient);
+        manager.del(remainder);
+        manager.del(result);
     }
 }
 
@@ -163,6 +173,14 @@ TEST(MpzTest1, GcdDividesAndExtendedGcd) {
         EXPECT_EQ(as_cpp(coefficient_a, manager) * a +
                   as_cpp(coefficient_b, manager) * b,
                   as_cpp(bezout_gcd, manager));
+
+        manager.del(x);
+        manager.del(y);
+        manager.del(gcd);
+        manager.del(lcm);
+        manager.del(coefficient_a);
+        manager.del(coefficient_b);
+        manager.del(bezout_gcd);
     }
 }
 
@@ -193,6 +211,10 @@ TEST(MpzTest1, PowersShiftsAndModuloPowersOfTwo) {
             set_value(manager, value, 2);
             manager.power(value, shift, divided);
             EXPECT_EQ(as_cpp(divided, manager), cpp_int(1) << shift);
+
+            manager.del(value);
+            manager.del(shifted);
+            manager.del(divided);
         }
     }
 }
@@ -220,6 +242,10 @@ TEST(MpzTest1, BitOperationsAndBitQueries) {
 
         for (unsigned bit = 0; bit < 300; ++bit)
             EXPECT_EQ(manager.get_bit(x, bit), boost::multiprecision::bit_test(a, bit));
+
+        manager.del(x);
+        manager.del(y);
+        manager.del(result);
     }
 }
 
@@ -245,6 +271,8 @@ TEST(MpzTest1, RootsAndNumberProperties) {
 
         manager.power(mpz(2), exponent, value);
         EXPECT_TRUE(manager.is_power_of_two(value));
+
+        manager.del(value); manager.del(root);
     }
 }
 
@@ -272,12 +300,15 @@ TEST(MpzTest1, FormattingAndConversions) {
     EXPECT_EQ(manager.get_uint64(value), 255u);
     EXPECT_EQ(manager.get_int64(value), 255);
     EXPECT_EQ(manager.get_least_significant(value), 255u);
+
+    manager.del(value);
 }
 
 TEST(MpzTest1, DivisionByZeroThrows) {
     mpz_manager manager;
     mpz value(1), zero(0), result;
     EXPECT_ANY_THROW(manager.machine_div(value, zero, result));
+    manager.del(value);  manager.del(zero);  manager.del(result);
 }
 
 } // namespace
