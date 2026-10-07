@@ -148,9 +148,9 @@ All bitwise operations require non-negative operands (asserted in debug builds).
 
 | Method | Signature | Description |
 |---|---|---|
-| `bitwise_or` | `void bitwise_or(mpz const & a, mpz const & b, mpz & c)` | c = a | b |
-| `bitwise_and` | `void bitwise_and(mpz const & a, mpz const & b, mpz & c)` | c = a & b |
-| `bitwise_xor` | `void bitwise_xor(mpz const & a, mpz const & b, mpz & c)` | c = a ^ b |
+| `bitwise_or` | `void bitwise_or(mpz const & a, mpz const & b, mpz & c)` |  |
+| `bitwise_and` | `void bitwise_and(mpz const & a, mpz const & b, mpz & c)` |  |
+| `bitwise_xor` | `void bitwise_xor(mpz const & a, mpz const & b, mpz & c)` |  |
 | `bitwise_not` | `void bitwise_not(unsigned sz, mpz const & a, mpz & c)` | `c = ~a`, masked to `sz` bits. The width parameter `sz` is required because the bitwise NOT of an arbitrary-precision integer is conceptually infinite. |
 | `get_bit` | `bool get_bit(mpz const & a, unsigned index)` | Returns the value of the bit at position `index` (0 = LSB). Returns `false` if `index` exceeds the number's bit width. |
 
