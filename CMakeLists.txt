@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.21)
 
-project(ez3i VERSION 1.0.3) # extracted_z3_integer
+project(ez3i VERSION 1.0.4) # extracted_z3_integer
 
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
@@ -54,12 +54,12 @@ add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 #
 target_include_directories(${PROJECT_NAME}
     PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
 target_compile_features(${PROJECT_NAME}
-    PUBLIC
+    PRIVATE
         cxx_std_20
 )
 

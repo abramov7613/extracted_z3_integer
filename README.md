@@ -1,3 +1,7 @@
+[![C++20](https://img.shields.io/badge/C%2B%2B-20-blue.svg)](https://en.cppreference.com/w/cpp/20)
+[![CMake](https://img.shields.io/badge/CMake-3.31%2B-blue.svg)](https://cmake.org/)
+[![build & test](https://github.com/abramov7613/extracted_z3_integer/actions/workflows/cmake-multi-platform.yml/badge.svg)](https://github.com/abramov7613/extracted_z3_integer/actions/workflows/cmake-multi-platform.yml)
+
 # ez3i
 
 **ez3i** (*extracted z3 integer*) is a standalone C++20 library for arbitrary-precision signed integer arithmetic. It was extracted from the [Z3 theorem prover](https://github.com/Z3Prover/z3) and packaged as an independent, dependency-free library.
@@ -75,7 +79,8 @@ public:
 
 `mpz_manager` is the central facade. It owns the low-level unsigned arithmetic engine (`mpn_manager`), manages all heap allocation for `mpz_cell` objects, and dispatches every operation to either a fast inline path (when both operands are small) or a multi-precision path (when at least one operand is large). Users are expected to create one `mpz_manager` instance and use it for all operations — it tracks internal state such as the pre-computed value of 2⁶⁴.
 
-> **Memory ownership rule.** Every `mpz` created or modified by `mpz_manager` must eventually be released with `del()` or `reset()`. Original Z3 architecture saved. The helper class `scoped_numeral` in cpp file provides RAII-style automatic cleanup.
+> [!IMPORTANT]
+> **Memory ownership rule.** Every `mpz` created or modified by `mpz_manager` must eventually be released with `del()` or `reset()`. Original Z3 architecture saved. The helper class `scoped_numeral` in cpp source file provides RAII-style automatic cleanup (or see examples).
 
 ---
 
@@ -262,7 +267,7 @@ include(FetchContent)
 FetchContent_Declare(
     ez3i
     GIT_REPOSITORY https://github.com/abramov7613/extracted_z3_integer.git
-    GIT_TAG        v1.0.3
+    GIT_TAG        v1.0.4
 )
 FetchContent_MakeAvailable(ez3i)
 
@@ -444,6 +449,124 @@ int main() {
     mgr.del(and_r); mgr.del(or_r); mgr.del(xor_r);
     mgr.del(pow_r);
 
+    return 0;
+}
+```
+
+### Example 4: RAII-style wrapper
+
+```cpp
+#include <ez3i/mpz.h>
+#include <string>
+#include <iostream>
+
+namespace ez3i = extracted_z3_integer ;
+
+class flexint {
+    ez3i::mpz m_num;
+public:
+    static ez3i::mpz_manager& m() {
+        static ez3i::mpz_manager m {} ;
+        return m;
+    }
+    flexint() {}
+    flexint(int n) { m().set(m_num, n); }
+    flexint(const std::string& s) { m().set(m_num, s.data()); }
+    flexint(flexint const& n) { m().set(m_num, n.m_num); }
+    flexint(flexint && n) noexcept { m().swap(m_num, n.m_num); }
+    ~flexint() { m().del(m_num); }
+    ez3i::mpz const & get() const { return m_num; }
+    ez3i::mpz & get() { return m_num; }
+    void reset() { m().reset(m_num); }
+    void swap(flexint & n) noexcept { m().swap(m_num, n.m_num); }
+    void swap(ez3i::mpz & n) noexcept { m().swap(m_num, n); }
+    std::string str() const { return m().to_string(m_num); }
+    explicit operator int() const { return m().get_int(m_num); }
+    operator ez3i::mpz const &() const { return m_num; }
+    operator ez3i::mpz&() { return m_num; }
+    flexint & operator=(flexint const & n) {
+        if (this == &n) return *this;
+        m().set(m_num, n.m_num);
+        return *this;
+    }
+    flexint & operator=(int n) {
+        m().set(m_num, n);
+        return *this;
+    }
+    flexint & operator=(ez3i::mpz const & n) {
+        m().set(m_num, n);
+        return *this;
+    }
+    flexint & operator+=(ez3i::mpz const & a) {
+        m().add(m_num, a, m_num);
+        return *this;
+    }
+    flexint & operator-=(ez3i::mpz const & a) {
+        m().sub(m_num, a, m_num);
+        return *this;
+    }
+    flexint & operator*=(ez3i::mpz const & a) {
+        m().mul(m_num, a, m_num);
+        return *this;
+    }
+    flexint & operator/=(ez3i::mpz const & a) {
+        m().div(m_num, a, m_num);
+        return *this;
+    }
+    flexint & operator%=(ez3i::mpz const & a) {
+        m().rem(m_num, a, m_num);
+        return *this;
+    }
+    friend bool operator==(flexint const & a, ez3i::mpz const & b) {
+        return a.m().eq(a, b);
+    }
+    friend bool operator!=(flexint const & a, ez3i::mpz const & b) {
+        return !a.m().eq(a, b);
+    }
+    friend bool operator<(flexint const & a, ez3i::mpz const & b) {
+        return a.m().lt(a, b);
+    }
+    friend bool operator>(flexint const & a, ez3i::mpz const & b) {
+        return a.m().gt(a, b);
+    }
+    friend bool operator<=(flexint const & a, ez3i::mpz const & b) {
+        return a.m().le(a, b);
+    }
+    friend bool operator>=(flexint const & a, ez3i::mpz const & b) {
+        return a.m().ge(a, b);
+    }
+    friend flexint operator+(flexint const & r1, ez3i::mpz const & r2) {
+        return flexint(r1) += r2;
+    }
+    friend flexint operator-(flexint const & r1, ez3i::mpz const & r2) {
+        return flexint(r1) -= r2;
+    }
+    friend flexint operator*(flexint const & r1, ez3i::mpz const & r2) {
+        return flexint(r1) *= r2;
+    }
+    friend flexint operator/(flexint const & r1, ez3i::mpz const & r2) {
+        return flexint(r1) /= r2;
+    }
+    friend flexint operator%(flexint const & r1, ez3i::mpz const & r2) {
+        return flexint(r1) %= r2;
+    }
+    friend std::ostream & operator<<(std::ostream & out, flexint const & s) {
+        s.m().display(out, s);
+        return out;
+    }
+}; // class flexint
+
+int main() {
+    flexint x = 5;
+    flexint y = 45;
+    flexint a ("123456789012345678901234567890");
+    flexint b ("987654321098765432109876543210");
+    std::cout << "x + y = " << x + y << "\n";
+    std::cout << "a + b = " << a + b << "\n";
+    std::cout << "x * y = " << x * y << "\n";
+    std::cout << "y / x = " << y / x << "\n";
+    std::cout << "y % x = " << y % x << "\n";
+    std::cout << "a * x = " << a * x << "\n";
     return 0;
 }
 ```
