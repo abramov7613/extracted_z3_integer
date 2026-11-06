@@ -1,5 +1,5 @@
 [![C++20](https://img.shields.io/badge/C%2B%2B-20-blue.svg)](https://en.cppreference.com/w/cpp/20)
-[![CMake](https://img.shields.io/badge/CMake-3.31%2B-blue.svg)](https://cmake.org/)
+[![CMake](https://img.shields.io/badge/CMake-3.21%2B-blue.svg)](https://cmake.org/)
 [![build & test](https://github.com/abramov7613/extracted_z3_integer/actions/workflows/cmake-multi-platform.yml/badge.svg)](https://github.com/abramov7613/extracted_z3_integer/actions/workflows/cmake-multi-platform.yml)
 
 # ez3i
@@ -453,7 +453,7 @@ int main() {
 }
 ```
 
-### Example 4: RAII-style wrapper
+### Example 4: class flexint - RAII-style wrapper
 
 ```cpp
 #include <ez3i/mpz.h>
