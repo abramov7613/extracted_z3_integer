@@ -169,6 +169,7 @@ All bitwise operations require non-negative operands (asserted in debug builds).
 | `gt` | `bool gt(mpz const & a, mpz const & b)` | Greater-than. |
 | `le` | `bool le(mpz const & a, mpz const & b)` | Less-than-or-equal. |
 | `ge` | `bool ge(mpz const & a, mpz const & b)` | Greater-than-or-equal. |
+| `cmp` | `int cmp(mpz const& a, mpz const& b)` | result == 0 if a and b are equal; result < 0 if a < b; result > 0 if a > b |
 | `is_pos` | `static bool is_pos(mpz const & a)` | True if `a > 0`. |
 | `is_neg` | `static bool is_neg(mpz const & a)` | True if `a < 0`. |
 | `is_zero` | `static bool is_zero(mpz const & a)` | True if `a == 0`. |
@@ -267,7 +268,7 @@ include(FetchContent)
 FetchContent_Declare(
     ez3i
     GIT_REPOSITORY https://github.com/abramov7613/extracted_z3_integer.git
-    GIT_TAG        v1.0.4
+    GIT_TAG        v1.0.5
 )
 FetchContent_MakeAvailable(ez3i)
 
@@ -453,12 +454,14 @@ int main() {
 }
 ```
 
-### Example 4: class flexint - RAII-style wrapper
+### Example 4: class flexint - single thread RAII style wrapper
 
 ```cpp
 #include <ez3i/mpz.h>
 #include <string>
 #include <iostream>
+#include <compare>
+#include <stdexcept>
 
 namespace ez3i = extracted_z3_integer ;
 
@@ -481,12 +484,19 @@ public:
     void swap(flexint & n) noexcept { m().swap(m_num, n.m_num); }
     void swap(ez3i::mpz & n) noexcept { m().swap(m_num, n); }
     std::string str() const { return m().to_string(m_num); }
-    explicit operator int() const { return m().get_int(m_num); }
+    explicit operator int() const {
+        if (!m().is_int(m_num))
+            throw std::overflow_error("flexint: value does not fit into int");
+        return m().get_int(m_num);
+    }
     operator ez3i::mpz const &() const { return m_num; }
-    operator ez3i::mpz&() { return m_num; }
     flexint & operator=(flexint const & n) {
         if (this == &n) return *this;
         m().set(m_num, n.m_num);
+        return *this;
+    }
+    flexint & operator=(flexint&& n) noexcept {
+        if (this != &n) m().swap(m_num, n.m_num);
         return *this;
     }
     flexint & operator=(int n) {
@@ -510,7 +520,7 @@ public:
         return *this;
     }
     flexint & operator/=(ez3i::mpz const & a) {
-        m().div(m_num, a, m_num);
+        m().machine_div(m_num, a, m_num);
         return *this;
     }
     flexint & operator%=(ez3i::mpz const & a) {
@@ -520,35 +530,33 @@ public:
     friend bool operator==(flexint const & a, ez3i::mpz const & b) {
         return a.m().eq(a, b);
     }
-    friend bool operator!=(flexint const & a, ez3i::mpz const & b) {
-        return !a.m().eq(a, b);
-    }
-    friend bool operator<(flexint const & a, ez3i::mpz const & b) {
-        return a.m().lt(a, b);
-    }
-    friend bool operator>(flexint const & a, ez3i::mpz const & b) {
-        return a.m().gt(a, b);
-    }
-    friend bool operator<=(flexint const & a, ez3i::mpz const & b) {
-        return a.m().le(a, b);
-    }
-    friend bool operator>=(flexint const & a, ez3i::mpz const & b) {
-        return a.m().ge(a, b);
+    friend std::strong_ordering operator<=>(flexint const& a, ez3i::mpz const& b) {
+        return a.m().cmp(a, b) <=> 0;
     }
     friend flexint operator+(flexint const & r1, ez3i::mpz const & r2) {
-        return flexint(r1) += r2;
+        flexint r;
+        r.m().add(r1.get(), r2, r.get());
+        return r;
     }
     friend flexint operator-(flexint const & r1, ez3i::mpz const & r2) {
-        return flexint(r1) -= r2;
+        flexint r;
+        r.m().sub(r1.get(), r2, r.get());
+        return r;
     }
     friend flexint operator*(flexint const & r1, ez3i::mpz const & r2) {
-        return flexint(r1) *= r2;
+        flexint r;
+        r.m().mul(r1.get(), r2, r.get());
+        return r;
     }
     friend flexint operator/(flexint const & r1, ez3i::mpz const & r2) {
-        return flexint(r1) /= r2;
+        flexint r;
+        r.m().machine_div(r1.get(), r2, r.get());
+        return r;
     }
     friend flexint operator%(flexint const & r1, ez3i::mpz const & r2) {
-        return flexint(r1) %= r2;
+        flexint r;
+        r.m().rem(r1.get(), r2, r.get());
+        return r;
     }
     friend std::ostream & operator<<(std::ostream & out, flexint const & s) {
         s.m().display(out, s);
