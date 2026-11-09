@@ -268,7 +268,7 @@ include(FetchContent)
 FetchContent_Declare(
     ez3i
     GIT_REPOSITORY https://github.com/abramov7613/extracted_z3_integer.git
-    GIT_TAG        v1.0.5
+    GIT_TAG        v1.1.0
 )
 FetchContent_MakeAvailable(ez3i)
 
