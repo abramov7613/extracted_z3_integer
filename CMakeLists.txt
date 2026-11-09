@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.21)
 
-project(ez3i VERSION 1.0.4) # extracted_z3_integer
+project(ez3i VERSION 1.0.5) # extracted_z3_integer
 
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
