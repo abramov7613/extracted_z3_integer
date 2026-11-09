@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <bit>
 #include <functional>
+#include <compare>
 #include <string_view>
 #include "ez3i/mpz.h"
 
@@ -137,33 +138,8 @@ public:
         return a.m().eq(a, b);
     }
 
-    friend bool operator==(_scoped_numeral const & a, _scoped_numeral const & b) {
-        return a.m().eq(a.m_num, b.m_num);
-    }
-
-    friend bool operator!=(_scoped_numeral const & a, numeral const & b) {
-        return !a.m().eq(a, b);
-    }
-
-    friend bool operator!=(_scoped_numeral const & a, _scoped_numeral const & b) {
-        return !(a == b);
-    }
-
-
-    friend bool operator<(_scoped_numeral const & a, numeral const & b) {
-        return a.m().lt(a, b);
-    }
-
-    friend bool operator>(_scoped_numeral const & a, numeral const & b) {
-        return a.m().gt(a, b);
-    }
-
-    friend bool operator<=(_scoped_numeral const & a, numeral const & b) {
-        return a.m().le(a, b);
-    }
-
-    friend bool operator>=(_scoped_numeral const & a, numeral const & b) {
-        return a.m().ge(a, b);
+    friend std::strong_ordering operator<=>(_scoped_numeral const& a, numeral const& b) {
+      return a.m().cmp(a, b) <=> 0;
     }
 
     bool is_zero() const {
