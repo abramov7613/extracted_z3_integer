@@ -348,6 +348,14 @@ public:
 
     bool neq(mpz const & a, mpz const & b) { return !eq(a, b); }
 
+    int cmp(mpz const& a, mpz const& b) {
+        if (is_small(a) && is_small(b)) {
+          int64_t x = i64(a), y = i64(b);
+          return (x > y) - (x < y);
+        }
+        return big_compare(a, b);
+    }
+
     bool gt(mpz const & a, mpz const & b) { return lt(b, a); }
 
     bool ge(mpz const & a, mpz const & b) { return !lt(a, b); }

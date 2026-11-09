@@ -552,6 +552,8 @@ void mpz_manager::submul(mpz const & a, mpz const & b, mpz const & c, mpz & d) {
 
 
 void mpz_manager::machine_div_rem(mpz const & a, mpz const & b, mpz & q, mpz & r) {
+    if (is_zero(b))
+        throw std::runtime_error("division by 0");
     if (is_small(a) && is_small(b)) {
         int64_t _a = i64(a);
         int64_t _b = i64(b);
@@ -565,9 +567,8 @@ void mpz_manager::machine_div_rem(mpz const & a, mpz const & b, mpz & q, mpz & r
 
 
 void mpz_manager::machine_div(mpz const & a, mpz const & b, mpz & c) {
-    if (is_small(b) && i64(b) == 0)
+    if (is_zero(b))
         throw std::runtime_error("division by 0");
-
     if (is_small(a) && is_small(b))
         set_i64(c, i64(a) / i64(b));
     else
@@ -582,6 +583,8 @@ void mpz_manager::reset(mpz & a) {
 
 
 void mpz_manager::rem(mpz const & a, mpz const & b, mpz & c) {
+    if (is_zero(b))
+        throw std::runtime_error("division by 0");
     if (is_small(a) && is_small(b)) {
         set_i64(c, i64(a) % i64(b));
     }
@@ -823,6 +826,8 @@ void mpz_manager::quot_rem_core(mpz const & a, mpz const & b, mpz & q, mpz & r)
       +26 / -7 = -3, remainder is +5
       -26 / -7 = +3, remainder is -5
     */
+    if (is_zero(b))
+        throw std::runtime_error("division by 0");
     mpz_stack q1, r1;
     sign_cell ca(*this, a), cb(*this, b);
     if (cb.cell()->m_size > ca.cell()->m_size) {
@@ -2168,6 +2173,8 @@ static unsigned div_u(unsigned k, unsigned n) {
 
 bool mpz_manager::root(mpz & a, unsigned n) {
     assert(n % 2 != 0 || is_nonneg(a));
+    if (n == 0)
+        throw std::invalid_argument("root: n must be positive");
     if (is_zero(a)) {
         return true; // precise
     }
